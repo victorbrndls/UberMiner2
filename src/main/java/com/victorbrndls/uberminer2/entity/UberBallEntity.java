@@ -1,16 +1,30 @@
 package com.victorbrndls.uberminer2.entity;
 
+import com.mojang.datafixers.util.Pair;
 import com.victorbrndls.uberminer2.item.UberMinerItems;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.stream.Stream;
 
 public class UberBallEntity extends ThrowableItemProjectile {
 
@@ -43,33 +57,73 @@ public class UberBallEntity extends ThrowableItemProjectile {
 //        hitResult.getEntity().hurt(DamageSource.thrown(this, this.getOwner()), 0.0F);
 //    }
 
+
     @Override
     protected void onHitBlock(BlockHitResult hitResult) {
         super.onHitBlock(hitResult);
-
+        discard();
+        extractOresAround(hitResult.getBlockPos());
     }
 
-    protected void onHit(HitResult hitResult) {
-        super.onHit(hitResult);
+    private void extractOresAround(BlockPos pos) {
         if (!this.level.isClientSide) {
-            if (this.random.nextInt(8) == 0) {
-                int i = 1;
-                if (this.random.nextInt(32) == 0) {
-                    i = 4;
-                }
+            var range = 2;
+            var ores = getOresToMine(pos, range);
 
-                for (int j = 0; j < i; ++j) {
-                    Chicken chicken = EntityType.CHICKEN.create(this.level);
-                    chicken.setAge(-24000);
-                    chicken.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F);
-                    this.level.addFreshEntity(chicken);
+            if (ores.isEmpty()) return;
+
+            ores.forEach((pair) -> {
+                var block = pair.getFirst();
+                level.setBlock(block, Blocks.STONE.defaultBlockState(), 3);
+            });
+
+            LootContext.Builder lootContextBuilder = getLootContextBuilder(pos);
+            var drops = ores.stream().flatMap((pair) -> {
+                var blockState = pair.getSecond();
+                return blockState.getDrops(lootContextBuilder).stream();
+            });
+
+            spawnOreDrops(pos, drops);
+        }
+    }
+
+    @NotNull
+    private ArrayList<Pair<BlockPos, BlockState>> getOresToMine(BlockPos pos, int range) {
+        var ores = new ArrayList<Pair<BlockPos, BlockState>>();
+
+        for (int x = -range; x <= range; x++) {
+            for (int y = -range; y <= range; y++) {
+                for (int z = -range; z <= range; z++) {
+                    var blockPos = pos.offset(x, y, z);
+                    var blockState = level.getBlockState(blockPos);
+
+                    if (isOre(blockState)) ores.add(Pair.of(blockPos, blockState));
                 }
             }
-
-            this.level.broadcastEntityEvent(this, (byte) 3);
-            this.discard();
         }
 
+        return ores;
+    }
+
+    private boolean isOre(BlockState blockState) {
+        var oreResourceLocation = new ResourceLocation("forge", "ores");
+        return blockState.getTags().anyMatch((tag) -> tag.location().equals(oreResourceLocation));
+    }
+
+    private void spawnOreDrops(BlockPos pos, Stream<ItemStack> drops) {
+        drops.forEach((itemStack) -> {
+            var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+            level.addFreshEntity(itemEntity);
+        });
+    }
+
+    @NotNull
+    private LootContext.Builder getLootContextBuilder(BlockPos pos) {
+        return (new LootContext.Builder((ServerLevel) this.level))
+                .withRandom(this.level.random)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+                .withParameter(LootContextParams.TOOL, new ItemStack(Items.NETHERITE_PICKAXE))
+                .withOptionalParameter(LootContextParams.THIS_ENTITY, getOwner());
     }
 
     protected Item getDefaultItem() {
