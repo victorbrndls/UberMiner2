@@ -7,9 +7,12 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.stream.Stream;
 
 public class UberBallEntity extends ThrowableItemProjectile {
@@ -49,25 +53,19 @@ public class UberBallEntity extends ThrowableItemProjectile {
                         ((double) this.random.nextFloat() - 0.5D) * 0.08D);
             }
         }
-
     }
-
-//    protected void onHitEntity(EntityHitResult hitResult) {
-//        super.onHitEntity(hitResult);
-//        hitResult.getEntity().hurt(DamageSource.thrown(this, this.getOwner()), 0.0F);
-//    }
-
 
     @Override
     protected void onHitBlock(BlockHitResult hitResult) {
         super.onHitBlock(hitResult);
         discard();
+        // TODO add cool sound
         extractOresAround(hitResult.getBlockPos());
     }
 
     private void extractOresAround(BlockPos pos) {
         if (!this.level.isClientSide) {
-            var range = 2;
+            var range = 2; // TODO support more ranges
             var ores = getOresToMine(pos, range);
 
             if (ores.isEmpty()) return;
@@ -119,11 +117,8 @@ public class UberBallEntity extends ThrowableItemProjectile {
 
     @NotNull
     private LootContext.Builder getLootContextBuilder(BlockPos pos) {
-        return (new LootContext.Builder((ServerLevel) this.level))
-                .withRandom(this.level.random)
-                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                .withParameter(LootContextParams.TOOL, new ItemStack(Items.NETHERITE_PICKAXE))
-                .withOptionalParameter(LootContextParams.THIS_ENTITY, getOwner());
+        // TODO support looting upgrade
+        return (new LootContext.Builder((ServerLevel) this.level)).withRandom(this.level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withParameter(LootContextParams.TOOL, new ItemStack(Items.NETHERITE_PICKAXE)).withOptionalParameter(LootContextParams.THIS_ENTITY, getOwner());
     }
 
     protected Item getDefaultItem() {
