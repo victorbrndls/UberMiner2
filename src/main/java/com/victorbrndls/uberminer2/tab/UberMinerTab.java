@@ -13,6 +13,6 @@ public class UberMinerTab extends CreativeModeTab {
 
     @Override
     public ItemStack makeIcon() {
-        return new ItemStack(UberMinerItems.UBER_BALL.get());
+        return new ItemStack(UberMinerItems.UBER_BALL_TIER_3.get());
     }
 }

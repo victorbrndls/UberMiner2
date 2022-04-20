@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "uberminer2:item/uber_ball_tier2"
+  }
+}

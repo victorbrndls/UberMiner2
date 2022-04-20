@@ -1,18 +1,17 @@
 package com.victorbrndls.uberminer2.entity;
 
 import com.mojang.datafixers.util.Pair;
+import com.victorbrndls.uberminer2.item.UberBallUpgrades;
 import com.victorbrndls.uberminer2.item.UberMinerItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,21 +26,26 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class UberBallEntity extends ThrowableItemProjectile {
+
+    private int range;
+    private List<UberBallUpgrades> upgrades;
 
     public UberBallEntity(EntityType<? extends UberBallEntity> entityType, Level level) {
         super(entityType, level);
     }
 
-    public UberBallEntity(Level level, LivingEntity livingEntity) {
+    public UberBallEntity(Level level, LivingEntity livingEntity, int range, List<UberBallUpgrades> upgrades) {
         super(UberMinerEntities.UBER_BALL.get(), livingEntity, level);
+        this.range = range;
+        this.upgrades = upgrades;
     }
 
-    public UberBallEntity(Level level, double p_37477_, double p_37478_, double p_37479_) {
-        super(UberMinerEntities.UBER_BALL.get(), p_37477_, p_37478_, p_37479_, level);
+    public UberBallEntity(Level level, double x, double y, double z) {
+        super(UberMinerEntities.UBER_BALL.get(), x, y, z, level);
     }
 
     public void handleEntityEvent(byte p_37484_) {
@@ -65,7 +69,6 @@ public class UberBallEntity extends ThrowableItemProjectile {
 
     private void extractOresAround(BlockPos pos) {
         if (!this.level.isClientSide) {
-            var range = 2; // TODO support more ranges
             var ores = getOresToMine(pos, range);
 
             if (ores.isEmpty()) return;
@@ -108,11 +111,21 @@ public class UberBallEntity extends ThrowableItemProjectile {
         return blockState.getTags().anyMatch((tag) -> tag.location().equals(oreResourceLocation));
     }
 
-    private void spawnOreDrops(BlockPos pos, Stream<ItemStack> drops) {
+    private void spawnOreDrops(BlockPos blockHitPosition, Stream<ItemStack> drops) {
         drops.forEach((itemStack) -> {
-            var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+            var spawnPos = getSpawnDropsPosition(blockHitPosition);
+
+            var itemEntity = new ItemEntity(level, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), itemStack);
             level.addFreshEntity(itemEntity);
         });
+    }
+
+    private BlockPos getSpawnDropsPosition(BlockPos entityHitPos) {
+        if (upgrades.contains(UberBallUpgrades.ADD_ITEMS_TO_PLAYER_INVENTORY)) {
+            return getOwner().blockPosition();
+        } else {
+            return entityHitPos;
+        }
     }
 
     @NotNull
@@ -122,6 +135,6 @@ public class UberBallEntity extends ThrowableItemProjectile {
     }
 
     protected Item getDefaultItem() {
-        return UberMinerItems.UBER_BALL.get();
+        return UberMinerItems.UBER_BALL_TIER_1.get();
     }
 }
