@@ -2,8 +2,12 @@
   "language": "English",
   "language.code": "en_us",
   "language.region": "United States",
+
   "itemGroup.uberminer2": "Uber Miner 2",
+
   "item.uberminer2.uber_ball_tier1": "Uber Powder I",
   "item.uberminer2.uber_ball_tier2": "Uber Powder II",
-  "item.uberminer2.uber_ball_tier3": "Uber Powder III"
+  "item.uberminer2.uber_ball_tier3": "Uber Powder III",
+
+  "block.uberminer2.uber_miner_tier1": "Uber Miner I"
 }

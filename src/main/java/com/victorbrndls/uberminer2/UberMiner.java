@@ -1,7 +1,9 @@
 package com.victorbrndls.uberminer2;
 
-import com.victorbrndls.uberminer2.entity.UberMinerEntities;
-import com.victorbrndls.uberminer2.item.UberMinerItems;
+import com.victorbrndls.uberminer2.registry.UberMinerBlocks;
+import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
+import com.victorbrndls.uberminer2.registry.UberMinerEntities;
+import com.victorbrndls.uberminer2.registry.UberMinerItems;
 import com.victorbrndls.uberminer2.render.UberMinerRenders;
 import com.victorbrndls.uberminer2.tab.UberMinerTab;
 import net.minecraft.world.item.CreativeModeTab;
@@ -19,7 +21,9 @@ public class UberMiner {
 
     public UberMiner() {
         UberMinerItems.init();
+        UberMinerBlocks.init();
         UberMinerEntities.init();
+        UberMinerBlockEntities.init();
     }
 
     @SubscribeEvent

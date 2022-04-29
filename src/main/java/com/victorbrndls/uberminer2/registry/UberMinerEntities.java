@@ -1,6 +1,8 @@
-package com.victorbrndls.uberminer2.entity;
+package com.victorbrndls.uberminer2.registry;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.entity.UberBallEntity;
+
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -14,11 +16,9 @@ public class UberMinerEntities {
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES,
             UberMiner.MOD_ID);
 
-    public static final RegistryObject<EntityType<UberBallEntity>> UBER_BALL =
-            register("thrown_uber_ball",
-                    EntityType.Builder.<UberBallEntity>of(UberBallEntity::new, MobCategory.MISC)
-                            .sized(0.25F, 0.25F)
-                            .clientTrackingRange(4).updateInterval(10));
+    // Projectiles
+    public static final RegistryObject<EntityType<UberBallEntity>> UBER_BALL = register("thrown_uber_ball",
+            EntityType.Builder.<UberBallEntity>of(UberBallEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
 
     public static void init() {
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -1,6 +1,6 @@
 package com.victorbrndls.uberminer2.render;
 
-import com.victorbrndls.uberminer2.entity.UberMinerEntities;
+import com.victorbrndls.uberminer2.registry.UberMinerEntities;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 
