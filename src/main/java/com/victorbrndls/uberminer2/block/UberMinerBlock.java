@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 public class UberMinerBlock extends BaseEntityBlock {
 
     public UberMinerBlock() {
-        super(BlockBehaviour.Properties.of(Material.METAL).strength(2.5F).sound(SoundType.METAL));
+        super(BlockBehaviour.Properties.of(Material.DECORATION).strength(0.5F).sound(SoundType.METAL));
     }
 
     @Override
