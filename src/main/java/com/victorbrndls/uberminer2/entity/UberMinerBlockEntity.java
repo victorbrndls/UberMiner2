@@ -88,7 +88,8 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState state, T blockEntity) {
-        UberMinerBlockEntity tile = (UberMinerBlockEntity) blockEntity;
+        UberMinerBlockEntity entity = (UberMinerBlockEntity) blockEntity;
+
 
     }
 
