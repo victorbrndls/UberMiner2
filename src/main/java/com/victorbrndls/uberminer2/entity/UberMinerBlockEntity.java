@@ -1,6 +1,7 @@
 package com.victorbrndls.uberminer2.entity;
 
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
+import com.victorbrndls.uberminer2.registry.UberMinerMenus;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -43,8 +44,8 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    protected AbstractContainerMenu createMenu(int p_58627_, Inventory p_58628_) {
-        return null;
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return UberMinerMenus.UBER_MINER.get().create(containerId, inventory);
     }
 
     @Override
