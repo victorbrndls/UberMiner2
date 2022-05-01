@@ -1,14 +1,15 @@
 package com.victorbrndls.uberminer2.entity;
 
+import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
+
 import com.mojang.datafixers.util.Pair;
 import com.victorbrndls.uberminer2.item.UberBallUpgrades;
-import com.victorbrndls.uberminer2.registry.UberMinerItems;
 import com.victorbrndls.uberminer2.registry.UberMinerEntities;
+import com.victorbrndls.uberminer2.registry.UberMinerItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -105,11 +107,6 @@ public class UberBallEntity extends ThrowableItemProjectile {
         }
 
         return ores;
-    }
-
-    private boolean isOre(BlockState blockState) {
-        var oreResourceLocation = new ResourceLocation("forge", "ores");
-        return blockState.getTags().anyMatch((tag) -> tag.location().equals(oreResourceLocation));
     }
 
     private void spawnOreDrops(BlockPos blockHitPosition, Stream<ItemStack> drops) {

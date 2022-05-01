@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -43,7 +44,8 @@ public class UberMinerBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState,
                                                                   BlockEntityType<T> entityType) {
-        return entityType == UberMinerBlockEntities.UBER_MINER.get() ? UberMinerBlockEntity::tick : null;
+        return level.isClientSide ? null : entityType == UberMinerBlockEntities.UBER_MINER.get() ?
+                UberMinerBlockEntity::tick : null;
     }
 
     @Override
