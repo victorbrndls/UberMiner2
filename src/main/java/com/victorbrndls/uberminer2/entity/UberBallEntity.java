@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Pair;
 import com.victorbrndls.uberminer2.item.UberBallUpgrades;
 import com.victorbrndls.uberminer2.registry.UberMinerEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerItems;
+import com.victorbrndls.uberminer2.util.ItemStackUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -13,7 +14,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class UberBallEntity extends ThrowableItemProjectile {
 
@@ -85,7 +84,7 @@ public class UberBallEntity extends ThrowableItemProjectile {
             var drops = ores.stream().flatMap((pair) -> {
                 var blockState = pair.getSecond();
                 return blockState.getDrops(lootContextBuilder).stream();
-            });
+            }).toList();
 
             spawnOreDrops(pos, drops);
         }
@@ -109,13 +108,9 @@ public class UberBallEntity extends ThrowableItemProjectile {
         return ores;
     }
 
-    private void spawnOreDrops(BlockPos blockHitPosition, Stream<ItemStack> drops) {
-        drops.forEach((itemStack) -> {
-            var spawnPos = getSpawnDropsPosition(blockHitPosition);
-
-            var itemEntity = new ItemEntity(level, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), itemStack);
-            level.addFreshEntity(itemEntity);
-        });
+    private void spawnOreDrops(BlockPos blockHitPosition, List<ItemStack> drops) {
+        var spawnPos = getSpawnDropsPosition(blockHitPosition);
+        ItemStackUtil.drop(level, spawnPos, drops);
     }
 
     private BlockPos getSpawnDropsPosition(BlockPos entityHitPos) {

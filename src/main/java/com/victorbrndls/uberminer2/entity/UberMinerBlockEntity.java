@@ -5,12 +5,15 @@ import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
 import com.victorbrndls.uberminer2.UberMiner;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerMenus;
+import com.victorbrndls.uberminer2.util.ItemStackUtil;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,10 +21,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -33,10 +39,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
+
+import javax.annotation.Nullable;
 
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
-    private int operationTicks = 0;
+    private int ticksSinceLastOperation = 0;
     private final int operationCost = 60;
 
     /**
@@ -117,9 +126,9 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     private void tick() {
-        operationTicks++;
-        if (operationTicks < operationCost) return;
-        operationTicks = 0;
+        ticksSinceLastOperation++;
+        if (ticksSinceLastOperation < operationCost) return;
+        ticksSinceLastOperation = 0;
 
         if (scannedOres == null) scanOres();
         if (!oresToMine.hasNext()) return;
@@ -164,11 +173,98 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     private void spawnOreDrops(BlockPos spawnPos, List<ItemStack> drops) {
-        // TODO unify with UberBallEntity
-        drops.forEach((itemStack) -> {
-            var itemEntity = new ItemEntity(level, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), itemStack);
-            level.addFreshEntity(itemEntity);
+        Container container = getDropContainer();
+        List<ItemStack> notDropped = new ArrayList<>();
+
+        if (container != null && !isFullContainer(container)) {
+            final var containerSize = container.getContainerSize();
+            drops.forEach(drop -> {
+                ItemStack left = null;
+                for (int slot = 0; slot < containerSize; slot++) {
+                    left = tryMoveInItem(container, drop, slot, Direction.DOWN);
+                    if (left.isEmpty()) break;
+                }
+                if (left != null && !left.isEmpty()) notDropped.add(left);
+            });
+            container.setChanged();
+            if (notDropped.isEmpty()) return;
+        }
+
+        if (notDropped.isEmpty()) {
+            ItemStackUtil.drop(level, spawnPos, drops);
+        } else {
+            ItemStackUtil.drop(level, spawnPos, notDropped);
+        }
+    }
+
+    private ItemStack tryMoveInItem(Container destination, ItemStack inStack, int slot, @Nullable Direction direction) {
+        ItemStack itemStack = destination.getItem(slot);
+
+        if (canPlaceItemInContainer(destination, inStack, slot, direction)) {
+            if (itemStack.isEmpty()) {
+                destination.setItem(slot, inStack);
+                inStack = ItemStack.EMPTY;
+            } else if (canMergeItems(itemStack, inStack)) {
+                int availableSpace = inStack.getMaxStackSize() - itemStack.getCount();
+                int itemsToMove = Math.min(inStack.getCount(), availableSpace);
+                inStack.shrink(itemsToMove);
+                itemStack.grow(itemsToMove);
+            }
+        }
+
+        return inStack;
+    }
+
+    private boolean canPlaceItemInContainer(Container container, ItemStack stack, int slot,
+                                            @Nullable Direction direction) {
+        if (!container.canPlaceItem(slot, stack)) {
+            return false;
+        } else {
+            return !(container instanceof WorldlyContainer) || ((WorldlyContainer) container).canPlaceItemThroughFace(slot, stack, direction);
+        }
+    }
+
+    @Nullable
+    private Container getDropContainer() {
+        BlockPos blockPos = getBlockPos().above();
+        BlockState blockstate = level.getBlockState(blockPos);
+        Block block = blockstate.getBlock();
+
+        if (blockstate.hasBlockEntity()) {
+            BlockEntity blockentity = level.getBlockEntity(blockPos);
+            if (blockentity instanceof Container container) {
+                if (container instanceof ChestBlockEntity && block instanceof ChestBlock) {
+                    return ChestBlock.getContainer((ChestBlock) block, blockstate, level, blockPos, true);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isFullContainer(Container container) {
+        return getSlots(container, Direction.DOWN).allMatch((index) -> {
+            ItemStack itemstack = container.getItem(index);
+            return itemstack.getCount() >= itemstack.getMaxStackSize();
         });
+    }
+
+    private IntStream getSlots(Container container, Direction direction) {
+        return container instanceof WorldlyContainer ?
+                IntStream.of(((WorldlyContainer) container).getSlotsForFace(direction)) : IntStream.range(0,
+                container.getContainerSize());
+    }
+
+    private static boolean canMergeItems(ItemStack firstStack, ItemStack secondStack) {
+        if (!firstStack.is(secondStack.getItem())) {
+            return false;
+        } else if (firstStack.getDamageValue() != secondStack.getDamageValue()) {
+            return false;
+        } else if (firstStack.getCount() >= firstStack.getMaxStackSize()) {
+            return false;
+        } else {
+            return ItemStack.tagMatches(firstStack, secondStack);
+        }
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState state, T blockEntity) {
