@@ -12,11 +12,11 @@ public class UberMinerMenu extends AbstractContainerMenu {
     public UberMinerMenu(int containerId, Inventory inventory) {
         super(UberMinerMenus.UBER_MINER.get(), containerId);
 
-        for(int x = 0; x < 3; ++x)
-            for(int y = 0; y < 9; ++y)
+        for (int x = 0; x < 3; ++x)
+            for (int y = 0; y < 9; ++y)
                 addSlot(new Slot(inventory, y + x * 9 + 9, 8 + y * 18, 84 + x * 18));
 
-        for(int x = 0; x < 9; ++x)
+        for (int x = 0; x < 9; ++x)
             addSlot(new Slot(inventory, x, 8 + x * 18, 142));
     }
 

@@ -2,6 +2,7 @@ package com.victorbrndls.uberminer2.item;
 
 import com.victorbrndls.uberminer2.UberMiner;
 import com.victorbrndls.uberminer2.entity.UberBallEntity;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class UberBallItem extends Item {
         ItemStack itemstack = player.getItemInHand(hand);
 
         level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRECHARGE_USE,
-                SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+                        SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
         if (!level.isClientSide) {
             var thrownUberBall = new UberBallEntity(level, player, range, upgrades);
@@ -50,10 +52,11 @@ public class UberBallItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack,
-                                @Nullable Level level,
-                                List<Component> components,
-                                TooltipFlag tooltipFlag) {
+    public void appendHoverText(
+            ItemStack itemStack,
+            @Nullable Level level,
+            List<Component> components,
+            TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
 
         var area = range * 2 + 1;

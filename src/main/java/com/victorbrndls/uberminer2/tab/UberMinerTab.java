@@ -2,6 +2,7 @@ package com.victorbrndls.uberminer2.tab;
 
 import com.victorbrndls.uberminer2.UberMiner;
 import com.victorbrndls.uberminer2.registry.UberMinerItems;
+
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 

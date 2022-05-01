@@ -12,10 +12,11 @@ import net.minecraftforge.registries.RegistryObject;
 public class UberMinerMenus {
 
     private static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.CONTAINERS,
-            UberMiner.MOD_ID);
+                                                                                       UberMiner.MOD_ID);
 
     public static final RegistryObject<MenuType<UberMinerMenu>> UBER_MINER = MENUS.register("uber_miner",
-            () -> new MenuType<>(UberMinerMenu::new));
+                                                                                            () -> new MenuType<>(
+                                                                                                    UberMinerMenu::new));
 
     public static void init() {
         MENUS.register(FMLJavaModLoadingContext.get().getModEventBus());

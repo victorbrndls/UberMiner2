@@ -7,6 +7,7 @@ import com.victorbrndls.uberminer2.item.UberBallUpgrades;
 import com.victorbrndls.uberminer2.registry.UberMinerEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerItems;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
+import com.victorbrndls.uberminer2.util.LootContextUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -54,9 +55,9 @@ public class UberBallEntity extends ThrowableItemProjectile {
         if (p_37484_ == 3) {
             for (int i = 0; i < 8; ++i) {
                 this.level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, this.getItem()), this.getX(),
-                        this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D,
-                        ((double) this.random.nextFloat() - 0.5D) * 0.08D,
-                        ((double) this.random.nextFloat() - 0.5D) * 0.08D);
+                                       this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D,
+                                       ((double) this.random.nextFloat() - 0.5D) * 0.08D,
+                                       ((double) this.random.nextFloat() - 0.5D) * 0.08D);
             }
         }
     }
@@ -80,7 +81,7 @@ public class UberBallEntity extends ThrowableItemProjectile {
                 level.setBlock(block, Blocks.STONE.defaultBlockState(), 3);
             });
 
-            LootContext.Builder lootContextBuilder = getLootContextBuilder(pos);
+            LootContext.Builder lootContextBuilder = LootContextUtil.getLootContextBuilder(level, pos);
             var drops = ores.stream().flatMap((pair) -> {
                 var blockState = pair.getSecond();
                 return blockState.getDrops(lootContextBuilder).stream();
@@ -119,12 +120,6 @@ public class UberBallEntity extends ThrowableItemProjectile {
         } else {
             return entityHitPos;
         }
-    }
-
-    @NotNull
-    private LootContext.Builder getLootContextBuilder(BlockPos pos) {
-        // TODO support looting upgrade
-        return (new LootContext.Builder((ServerLevel) this.level)).withRandom(this.level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withParameter(LootContextParams.TOOL, new ItemStack(Items.NETHERITE_PICKAXE)).withOptionalParameter(LootContextParams.THIS_ENTITY, getOwner());
     }
 
     protected Item getDefaultItem() {

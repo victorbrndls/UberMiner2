@@ -42,15 +42,17 @@ public class UberMinerBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState,
-                                                                  BlockEntityType<T> entityType) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState blockState,
+            BlockEntityType<T> entityType) {
         return level.isClientSide ? null : entityType == UberMinerBlockEntities.UBER_MINER.get() ?
                 UberMinerBlockEntity::tick : null;
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level level, BlockPos pPos, Player pPlayer,
-                                 InteractionHand pHand, BlockHitResult pHit) {
+    public InteractionResult use(
+            BlockState pState, Level level, BlockPos pPos, Player pPlayer,
+            InteractionHand pHand, BlockHitResult pHit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {

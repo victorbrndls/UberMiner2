@@ -17,7 +17,8 @@ public class UberMinerBlockEntities {
     // Blocks
     public static final RegistryObject<BlockEntityType<UberMinerBlockEntity>> UBER_MINER =
             BLOCK_ENTITIES.register("entity_uber_miner", () -> BlockEntityType.Builder.of(UberMinerBlockEntity::new,
-                    UberMinerBlocks.UBER_MINER_TIER_1.get()).build(null));
+                                                                                          UberMinerBlocks.UBER_MINER_TIER_1.get())
+                    .build(null));
 
     public static void init() {
         BLOCK_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());

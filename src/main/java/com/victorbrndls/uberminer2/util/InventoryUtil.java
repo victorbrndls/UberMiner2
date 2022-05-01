@@ -20,8 +20,9 @@ import javax.annotation.Nullable;
 
 public class InventoryUtil {
 
-    public static List<ItemStack> tryMoveInItems(Container destination, List<ItemStack> inStacks,
-                                                 @Nullable Direction direction) {
+    public static List<ItemStack> tryMoveInItems(
+            Container destination, List<ItemStack> inStacks,
+            @Nullable Direction direction) {
         if (InventoryUtil.isFullContainer(destination)) return inStacks;
         List<ItemStack> notMoved = new ArrayList<>();
 
@@ -40,8 +41,9 @@ public class InventoryUtil {
         return notMoved;
     }
 
-    public static ItemStack tryMoveInItem(Container destination, ItemStack inStack, int slot,
-                                          @Nullable Direction direction) {
+    public static ItemStack tryMoveInItem(
+            Container destination, ItemStack inStack, int slot,
+            @Nullable Direction direction) {
         ItemStack itemStack = destination.getItem(slot);
 
         if (canPlaceItemInContainer(destination, inStack, slot, direction)) {
@@ -86,15 +88,17 @@ public class InventoryUtil {
     private static IntStream getSlots(Container container, Direction direction) {
         return container instanceof WorldlyContainer ?
                 IntStream.of(((WorldlyContainer) container).getSlotsForFace(direction)) : IntStream.range(0,
-                container.getContainerSize());
+                                                                                                          container.getContainerSize());
     }
 
-    private static boolean canPlaceItemInContainer(Container container, ItemStack stack, int slot,
-                                                   @Nullable Direction direction) {
+    private static boolean canPlaceItemInContainer(
+            Container container, ItemStack stack, int slot,
+            @Nullable Direction direction) {
         if (!container.canPlaceItem(slot, stack)) {
             return false;
         } else {
-            return !(container instanceof WorldlyContainer) || ((WorldlyContainer) container).canPlaceItemThroughFace(slot, stack, direction);
+            return !(container instanceof WorldlyContainer) || ((WorldlyContainer) container).canPlaceItemThroughFace(
+                    slot, stack, direction);
         }
     }
 

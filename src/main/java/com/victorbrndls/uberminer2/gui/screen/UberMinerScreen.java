@@ -16,7 +16,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class UberMinerScreen extends AbstractContainerScreen<UberMinerMenu> {
 
-    private static final ResourceLocation GUI_LOCATION = new ResourceLocation(UberMiner.MOD_ID, "textures/gui/uber_miner.png");
+    private static final ResourceLocation GUI_LOCATION = new ResourceLocation(UberMiner.MOD_ID,
+                                                                              "textures/gui/uber_miner.png");
 
     public UberMinerScreen(UberMinerMenu menu, Inventory playerInventory, Component tile) {
         super(menu, playerInventory, tile);

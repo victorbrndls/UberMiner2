@@ -7,6 +7,7 @@ import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerMenus;
 import com.victorbrndls.uberminer2.util.InventoryUtil;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
+import com.victorbrndls.uberminer2.util.LootContextUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -138,8 +139,8 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         // TODO replace nether ores with netherrack, ...
         level.setBlock(nextOrePos, Blocks.STONE.defaultBlockState(), 3);
 
-        final var drops = nextOreBlockState.getDrops(getLootContextBuilder(nextOrePos));
-        spawnOreDrops(getBlockPos().above(), drops);
+        final var drops = nextOreBlockState.getDrops(LootContextUtil.getLootContextBuilder(level, nextOrePos));
+        insertOrDropOres(drops);
     }
 
     private void scanOres() {
@@ -147,9 +148,13 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         LevelChunk chunk = level.getChunkAt(getBlockPos());
         ChunkPos chunkPos = chunk.getPos();
 
-        final var blocksToScan = BlockPos.betweenClosed(chunkPos.getMinBlockX(), level.getMinBuildHeight(),
-                chunkPos.getMinBlockZ(), chunkPos.getMaxBlockX(), Math.max(level.getMinBuildHeight(),
-                        getBlockPos().getY() - 1), chunkPos.getMaxBlockZ());
+        final var blocksToScan = BlockPos.betweenClosed(
+                chunkPos.getMinBlockX(),
+                level.getMinBuildHeight(),
+                chunkPos.getMinBlockZ(),
+                chunkPos.getMaxBlockX(),
+                Math.max(level.getMinBuildHeight(), getBlockPos().getY() - 1),
+                chunkPos.getMaxBlockZ());
 
         scannedOres = new ArrayList<>();
 
@@ -162,13 +167,8 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         oresToMine = scannedOres.iterator();
     }
 
-    @NotNull
-    private LootContext.Builder getLootContextBuilder(BlockPos pos) {
-        // TODO unify with UberBallEntity
-        return (new LootContext.Builder((ServerLevel) level)).withRandom(level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withParameter(LootContextParams.TOOL, new ItemStack(Items.NETHERITE_PICKAXE));
-    }
-
-    private void spawnOreDrops(BlockPos spawnPos, List<ItemStack> drops) {
+    private void insertOrDropOres(List<ItemStack> drops) {
+        final var spawnPos = getBlockPos().above();
         Container container = getDropContainer();
 
         if (container != null) {
