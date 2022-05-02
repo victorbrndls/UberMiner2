@@ -11,6 +11,7 @@ public class ItemStackUtil {
 
     public static void drop(Level level, BlockPos position, ItemStack itemStack) {
         var itemEntity = new ItemEntity(level, position.getX(), position.getY(), position.getZ(), itemStack);
+        itemEntity.setPickUpDelay(5);
         level.addFreshEntity(itemEntity);
     }
 

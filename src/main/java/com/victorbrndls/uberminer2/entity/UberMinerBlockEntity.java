@@ -95,26 +95,26 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public ItemStack getItem(int p_18941_) {
+    public ItemStack getItem(int slot) {
         return null;
     }
 
     @Override
-    public ItemStack removeItem(int p_18942_, int p_18943_) {
+    public ItemStack removeItem(int slot, int count) {
         return null;
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int p_18951_) {
+    public ItemStack removeItemNoUpdate(int slot) {
         return null;
     }
 
     @Override
-    public void setItem(int p_18944_, ItemStack p_18945_) {
+    public void setItem(int slot, ItemStack itemStack) {
     }
 
     @Override
-    public boolean stillValid(Player p_18946_) {
+    public boolean stillValid(Player player) {
         return true;
     }
 

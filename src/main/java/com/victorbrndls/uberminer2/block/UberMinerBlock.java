@@ -3,16 +3,21 @@ package com.victorbrndls.uberminer2.block;
 import com.victorbrndls.uberminer2.entity.UberMinerBlockEntity;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,6 +27,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class UberMinerBlock extends BaseEntityBlock {
 
@@ -62,5 +69,14 @@ public class UberMinerBlock extends BaseEntityBlock {
             }
             return InteractionResult.CONSUME;
         }
+    }
+
+    @Override
+    public void appendHoverText(
+            ItemStack itemStack, @Nullable BlockGetter level, List<Component> components, TooltipFlag flag) {
+        super.appendHoverText(itemStack, level, components, flag);
+
+        components.add(new TextComponent("Items are automatically inserted at chest above miner")
+                               .withStyle(ChatFormatting.WHITE));
     }
 }
