@@ -13,13 +13,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -28,11 +26,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
-
-import org.jetbrains.annotations.NotNull;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +41,8 @@ import javax.annotation.Nullable;
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     private int ticksSinceLastOperation = 0;
-    private final int operationCost = 60;
+    private final int ticksToCompleteOperation = 60;
+    private final int operationEnergyCost = 4000;
 
     /**
      * Contains all ores the miner mined or will mine
@@ -53,6 +52,9 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
      * Returns the next ore to mine
      */
     private Iterator<BlockPos> oresToMine;
+
+    private final IEnergyStorage energy = new EnergyStorage(32000);
+    private final LazyOptional<IEnergyStorage> energyProxyCapability = LazyOptional.of(() -> energy);
 
     public UberMinerBlockEntity(BlockPos blockPos, BlockState blockState) {
         this(UberMinerBlockEntities.UBER_MINER.get(), blockPos, blockState);
@@ -65,13 +67,23 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        // other
+        tag.putInt("Energy", energy.getEnergyStored());
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        // other
+        if (tag.contains("Energy")) {
+            energy.receiveEnergy(tag.getInt("Energy"), false);
+        }
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
+        if (cap == CapabilityEnergy.ENERGY) {
+            return energyProxyCapability.cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override
@@ -124,11 +136,14 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     private void tick() {
         ticksSinceLastOperation++;
-        if (ticksSinceLastOperation < operationCost) return;
+        if (ticksSinceLastOperation < ticksToCompleteOperation) return;
         ticksSinceLastOperation = 0;
 
         if (scannedOres == null) scanOres();
         if (!oresToMine.hasNext()) return;
+
+        if (energy.getEnergyStored() < operationEnergyCost) return;
+        energy.extractEnergy(operationEnergyCost, false);
 
         final var nextOrePos = oresToMine.next();
         final var nextOreBlockState = level.getBlockState(nextOrePos);

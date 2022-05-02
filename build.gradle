@@ -112,6 +112,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:1.18.2-$version_forge"
 
     runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:$version_jei")
+
+    runtimeOnly fg.deobf("mekanism:Mekanism:$version_mekanism")
+    runtimeOnly fg.deobf("mekanism:Mekanism:$version_mekanism:generators")
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

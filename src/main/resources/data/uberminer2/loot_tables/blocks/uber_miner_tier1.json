@@ -8,6 +8,11 @@
           "type": "minecraft:item",
           "name": "uberminer2:uber_miner_tier1"
         }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
       ]
     }
   ]
