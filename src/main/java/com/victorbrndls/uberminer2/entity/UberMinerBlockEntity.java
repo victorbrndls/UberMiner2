@@ -3,8 +3,8 @@ package com.victorbrndls.uberminer2.entity;
 import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
-import com.victorbrndls.uberminer2.registry.UberMinerMenus;
 import com.victorbrndls.uberminer2.util.InventoryUtil;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
 import com.victorbrndls.uberminer2.util.LootContextUtil;
@@ -40,8 +40,11 @@ import javax.annotation.Nullable;
 
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
-    private int ticksSinceLastOperation = 0;
-    private final int ticksToCompleteOperation = 60;
+    /**
+     * Goes from 0 to {@link totalOperationTime}. Represents ticks since last operation.
+     */
+    public int operationTime = 0;
+    public final int totalOperationTime = 60;
     private final int operationEnergyCost = 4000;
 
     /**
@@ -93,7 +96,7 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
-        return UberMinerMenus.UBER_MINER.get().create(containerId, inventory);
+        return new UberMinerContainer(containerId, level, getBlockPos(), inventory, inventory.player);
     }
 
     @Override
@@ -135,9 +138,9 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     private void tick() {
-        ticksSinceLastOperation++;
-        if (ticksSinceLastOperation < ticksToCompleteOperation) return;
-        ticksSinceLastOperation = 0;
+        operationTime++;
+        if (operationTime < totalOperationTime) return;
+        operationTime = 0;
 
         if (scannedOres == null) scanOres();
         if (!oresToMine.hasNext()) return;
@@ -163,13 +166,10 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         LevelChunk chunk = level.getChunkAt(getBlockPos());
         ChunkPos chunkPos = chunk.getPos();
 
-        final var blocksToScan = BlockPos.betweenClosed(
-                chunkPos.getMinBlockX(),
-                level.getMinBuildHeight(),
-                chunkPos.getMinBlockZ(),
-                chunkPos.getMaxBlockX(),
-                Math.max(level.getMinBuildHeight(), getBlockPos().getY() - 1),
-                chunkPos.getMaxBlockZ());
+        final var blocksToScan = BlockPos.betweenClosed(chunkPos.getMinBlockX(), level.getMinBuildHeight(),
+                                                        chunkPos.getMinBlockZ(), chunkPos.getMaxBlockX(),
+                                                        Math.max(level.getMinBuildHeight(), getBlockPos().getY() - 1),
+                                                        chunkPos.getMaxBlockZ());
 
         scannedOres = new ArrayList<>();
 

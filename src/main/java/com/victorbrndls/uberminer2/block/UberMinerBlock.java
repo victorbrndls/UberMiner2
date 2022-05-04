@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -58,14 +60,14 @@ public class UberMinerBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(
-            BlockState pState, Level level, BlockPos pPos, Player pPlayer,
-            InteractionHand pHand, BlockHitResult pHit) {
+            BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
-            BlockEntity blockEntity = level.getBlockEntity(pPos);
+            BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof UberMinerBlockEntity) {
-                pPlayer.openMenu((MenuProvider) blockEntity);
+                NetworkHooks.openGui((ServerPlayer) player, (MenuProvider) blockEntity, blockEntity.getBlockPos());
             }
             return InteractionResult.CONSUME;
         }
