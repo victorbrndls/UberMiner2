@@ -29,7 +29,9 @@ public class UberMinerScreen extends AbstractContainerScreen<UberMinerContainer>
     public void render(PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(poseStack);
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
+
         this.renderTooltip(poseStack, pMouseX, pMouseY);
+        renderTooltips(poseStack, pMouseX, pMouseY);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class UberMinerScreen extends AbstractContainerScreen<UberMinerContainer>
                 i + 6,
                 j + 66,
                 i + 9,
-                j + 14 + GuiUtil.lerp(0, 53, menu.getStoredEnergyPercentage()),
+                j + 66 - GuiUtil.lerp(0, 49, menu.getStoredEnergyPercentage()),
                 0xFFFFFFFF
         );
     }
@@ -67,4 +69,25 @@ public class UberMinerScreen extends AbstractContainerScreen<UberMinerContainer>
                 0xFFFFFFFF
         );
     }
+
+    private void renderTooltips(PoseStack poseStack, int mouseX, int mouseY) {
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
+
+        final var actualX = mouseX - i;
+        final var actualY = mouseY - j;
+
+        // Energy
+        if (actualX >= 5 && actualX <= 10 && actualY >= 16 && actualY <= 67) {
+            Component text = Component.nullToEmpty(menu.getStoredEnergy() + " / " + menu.getMaxStoredEnergy());
+            renderTooltip(poseStack, text, mouseX, mouseY);
+        }
+
+        // Progress
+        if (actualX >= 43 && actualX <= 133 && actualY >= 62 && actualY <= 66) {
+            Component text = Component.nullToEmpty(menu.getOperationTime() + " / " + menu.getTotalOperationTime());
+            renderTooltip(poseStack, text, mouseX, mouseY);
+        }
+    }
+
 }

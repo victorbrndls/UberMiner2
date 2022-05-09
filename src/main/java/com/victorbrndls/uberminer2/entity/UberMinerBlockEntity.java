@@ -3,6 +3,8 @@ package com.victorbrndls.uberminer2.entity;
 import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.energy.UberEnergyStorage;
+import com.victorbrndls.uberminer2.energy.UberEnergyStorageImpl;
 import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.util.InventoryUtil;
@@ -29,7 +31,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
      */
     private Iterator<BlockPos> oresToMine;
 
-    private final IEnergyStorage energy = new EnergyStorage(32000);
+    private final UberEnergyStorage energy = new UberEnergyStorageImpl(32000);
     private final LazyOptional<IEnergyStorage> energyProxyCapability = LazyOptional.of(() -> energy);
 
     public UberMinerBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -137,7 +138,24 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     public void clearContent() {
     }
 
+    public int getStoredEnergy() {
+        return energy.getEnergyStored();
+    }
+
+    public void setStoredEnergy(int energy) {
+        this.energy.restoreEnergy(energy);
+    }
+
+    public int getMaxStoredEnergy() {
+        return energy.getMaxEnergyStored();
+    }
+
     private void tick() {
+        if (energy.getEnergyStored() < operationEnergyCost) {
+            operationTime = 0;
+            return;
+        }
+
         operationTime++;
         if (operationTime < totalOperationTime) return;
         operationTime = 0;
@@ -145,7 +163,6 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         if (scannedOres == null) scanOres();
         if (!oresToMine.hasNext()) return;
 
-        if (energy.getEnergyStored() < operationEnergyCost) return;
         energy.extractEnergy(operationEnergyCost, false);
 
         final var nextOrePos = oresToMine.next();
