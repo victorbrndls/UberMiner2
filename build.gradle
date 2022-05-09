@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '2.0.1'
+version = '2.0.2'
 group = 'com.victorbrndls.uberminer2'
 archivesBaseName = "UberMiner"
 
@@ -24,7 +24,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-    mappings channel: 'parchment', version: version_minecraft + "-2022.03.13-1.18.2"
+    mappings channel: 'parchment', version: version_minecraft + "-2022.03.13-$version_minecraft"
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -109,9 +109,9 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:1.18.2-$version_forge"
+    minecraft "net.minecraftforge:forge:$version_minecraft-$version_forge"
 
-    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:$version_jei")
+    runtimeOnly fg.deobf("mezz.jei:jei-$version_minecraft:$version_jei")
 
     runtimeOnly fg.deobf("mekanism:Mekanism:$version_mekanism")
     runtimeOnly fg.deobf("mekanism:Mekanism:$version_mekanism:generators")
