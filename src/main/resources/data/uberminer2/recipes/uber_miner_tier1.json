@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RDR",
+    "YBZ",
+    "ILI"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "Y": {
+      "item": "minecraft:iron_pickaxe"
+    },
+    "Z": {
+      "item": "minecraft:iron_shovel"
+    },
+    "B": {
+      "item": "uberminer2:uber_ball_tier1"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "L": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "uberminer2:uber_miner_tier1",
+    "count": 1
+  }
+}
