@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,6 +31,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -216,10 +216,10 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     private void insertOrDropOres(List<ItemStack> drops) {
         final var spawnPos = getBlockPos().above();
-        Container container = getDropContainer();
+        IItemHandler itemHandler = getItemHandler();
 
-        if (container != null) {
-            final var notDropped = InventoryUtil.tryMoveInItems(container, drops, Direction.DOWN);
+        if (itemHandler != null) {
+            final var notDropped = InventoryUtil.tryMoveInItems(itemHandler, drops);
             if (!notDropped.isEmpty()) ItemStackUtil.drop(level, spawnPos, notDropped);
         } else {
             ItemStackUtil.drop(level, spawnPos, drops);
@@ -227,10 +227,11 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Nullable
-    private Container getDropContainer() {
+    private IItemHandler getItemHandler() {
         BlockPos blockPos = getBlockPos().above();
-        return InventoryUtil.getContainerAt(level, blockPos);
+        return InventoryUtil.getItemHandlerAt(level, blockPos, Direction.DOWN);
     }
+
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState state, T blockEntity) {
         ((UberMinerBlockEntity) blockEntity).tick();

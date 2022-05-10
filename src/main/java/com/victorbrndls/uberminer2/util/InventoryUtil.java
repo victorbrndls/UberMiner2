@@ -2,15 +2,12 @@ package com.victorbrndls.uberminer2.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.Container;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,98 +17,57 @@ import javax.annotation.Nullable;
 
 public class InventoryUtil {
 
-    public static List<ItemStack> tryMoveInItems(
-            Container destination, List<ItemStack> inStacks,
-            @Nullable Direction direction) {
-        if (InventoryUtil.isFullContainer(destination)) return inStacks;
-        List<ItemStack> notMoved = new ArrayList<>();
+    public static List<ItemStack> tryMoveInItems(IItemHandler itemHandler, List<ItemStack> inStacks) {
+        if (isItemHandlerFull(itemHandler)) return inStacks;
 
-        final var destinationSize = destination.getContainerSize();
+        List<ItemStack> notMoved = new ArrayList<>();
+        final var itemHandlerSlots = itemHandler.getSlots();
 
         inStacks.forEach(drop -> {
             ItemStack left = null;
-            for (int slot = 0; slot < destinationSize; slot++) {
-                left = InventoryUtil.tryMoveInItem(destination, drop, slot, direction);
+            for (int slot = 0; slot < itemHandlerSlots; slot++) {
+                left = InventoryUtil.tryMoveInItem(itemHandler, drop, slot);
                 if (left.isEmpty()) break;
             }
             if (left != null && !left.isEmpty()) notMoved.add(left);
         });
 
-        if (!inStacks.equals(notMoved)) destination.setChanged();
         return notMoved;
     }
 
-    public static ItemStack tryMoveInItem(
-            Container destination, ItemStack inStack, int slot,
-            @Nullable Direction direction) {
-        ItemStack itemStack = destination.getItem(slot);
-
-        if (canPlaceItemInContainer(destination, inStack, slot, direction)) {
-            if (itemStack.isEmpty()) {
-                destination.setItem(slot, inStack);
-                inStack = ItemStack.EMPTY;
-            } else if (canMergeItems(itemStack, inStack)) {
-                int availableSpace = inStack.getMaxStackSize() - itemStack.getCount();
-                int itemsToMove = Math.min(inStack.getCount(), availableSpace);
-                inStack.shrink(itemsToMove);
-                itemStack.grow(itemsToMove);
-            }
-        }
-
-        return inStack;
+    private static ItemStack tryMoveInItem(IItemHandler itemHandler, ItemStack itemStack, int slot) {
+        return itemHandler.insertItem(slot, itemStack, false);
     }
 
     @Nullable
-    public static Container getContainerAt(Level level, BlockPos blockPos) {
+    public static IItemHandler getItemHandlerAt(Level level, BlockPos blockPos, Direction direction) {
         BlockState blockstate = level.getBlockState(blockPos);
-        Block block = blockstate.getBlock();
 
         if (blockstate.hasBlockEntity()) {
-            BlockEntity blockentity = level.getBlockEntity(blockPos);
-            if (blockentity instanceof Container container) {
-                if (container instanceof ChestBlockEntity && block instanceof ChestBlock) {
-                    return ChestBlock.getContainer((ChestBlock) block, blockstate, level, blockPos, true);
-                }
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+
+            final var capability = blockEntity.getCapability(
+                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction
+            ).resolve();
+
+            if (capability.isPresent()) {
+                IItemHandler itemHandler = capability.get();
+                return itemHandler;
             }
         }
 
         return null;
     }
 
-    public static boolean isFullContainer(Container container) {
-        return getSlots(container, Direction.DOWN).allMatch((index) -> {
-            ItemStack itemstack = container.getItem(index);
+    public static boolean isItemHandlerFull(IItemHandler container) {
+        return getSlots(container).allMatch((index) -> {
+            ItemStack itemstack = container.getStackInSlot(index);
             return itemstack.getCount() >= itemstack.getMaxStackSize();
         });
     }
 
-    private static IntStream getSlots(Container container, Direction direction) {
-        return container instanceof WorldlyContainer ?
-                IntStream.of(((WorldlyContainer) container).getSlotsForFace(direction)) : IntStream.range(0,
-                                                                                                          container.getContainerSize());
-    }
-
-    private static boolean canPlaceItemInContainer(
-            Container container, ItemStack stack, int slot,
-            @Nullable Direction direction) {
-        if (!container.canPlaceItem(slot, stack)) {
-            return false;
-        } else {
-            return !(container instanceof WorldlyContainer) || ((WorldlyContainer) container).canPlaceItemThroughFace(
-                    slot, stack, direction);
-        }
-    }
-
-    private static boolean canMergeItems(ItemStack firstStack, ItemStack secondStack) {
-        if (!firstStack.is(secondStack.getItem())) {
-            return false;
-        } else if (firstStack.getDamageValue() != secondStack.getDamageValue()) {
-            return false;
-        } else if (firstStack.getCount() >= firstStack.getMaxStackSize()) {
-            return false;
-        } else {
-            return ItemStack.tagMatches(firstStack, secondStack);
-        }
+    private static IntStream getSlots(IItemHandler itemHandler) {
+        return IntStream.range(0, itemHandler.getSlots());
     }
 
 }
