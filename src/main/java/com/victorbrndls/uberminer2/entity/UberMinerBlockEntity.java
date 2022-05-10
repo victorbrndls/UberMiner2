@@ -52,10 +52,15 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
      * Contains all ores the miner mined or will mine
      */
     private List<BlockPos> scannedOres;
+    public int scannedOresCount = 0;
     /**
      * Returns the next ore to mine
      */
     private Iterator<BlockPos> oresToMine;
+    /**
+     * Incremented every time an ore is mined
+     */
+    public int oresMined = 0;
 
     private final UberEnergyStorage energy = new UberEnergyStorageImpl(32000);
     private final LazyOptional<IEnergyStorage> energyProxyCapability = LazyOptional.of(() -> energy);
@@ -150,6 +155,14 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         return energy.getMaxEnergyStored();
     }
 
+    public int getOresMined() {
+        return oresMined;
+    }
+
+    public int getTotalScannedOres() {
+        return scannedOresCount;
+    }
+
     private void tick() {
         if (energy.getEnergyStored() < operationEnergyCost) {
             operationTime = 0;
@@ -173,6 +186,7 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
         // TODO replace nether ores with netherrack, ...
         level.setBlock(nextOrePos, Blocks.STONE.defaultBlockState(), 3);
+        oresMined++;
 
         final var drops = nextOreBlockState.getDrops(LootContextUtil.getLootContextBuilder(level, nextOrePos));
         insertOrDropOres(drops);
@@ -197,6 +211,7 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         UberMiner.LOGGER.debug("Found {} ores", scannedOres.size());
 
         oresToMine = scannedOres.iterator();
+        scannedOresCount = scannedOres.size();
     }
 
     private void insertOrDropOres(List<ItemStack> drops) {

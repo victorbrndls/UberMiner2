@@ -53,6 +53,31 @@ public class UberMinerContainer extends AbstractContainerMenu {
                 blockEntity.setStoredEnergy(value);
             }
         });
+
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return blockEntity.oresMined;
+            }
+
+            @Override
+            public void set(int value) {
+                blockEntity.oresMined = value;
+            }
+        });
+
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return blockEntity.scannedOresCount;
+            }
+
+            @Override
+            public void set(int value) {
+                blockEntity.scannedOresCount = value;
+            }
+        });
+
     }
 
     @Override
@@ -82,6 +107,18 @@ public class UberMinerContainer extends AbstractContainerMenu {
 
     public float getProgressPercentage() {
         return blockEntity.operationTime / (float) blockEntity.totalOperationTime;
+    }
+
+    public int getOresMined() {
+        return blockEntity.getOresMined();
+    }
+
+    public int getScannedOres() {
+        return blockEntity.getTotalScannedOres();
+    }
+
+    public float getMinedOresProgress() {
+        return getOresMined() / (float) getScannedOres();
     }
 
 }
