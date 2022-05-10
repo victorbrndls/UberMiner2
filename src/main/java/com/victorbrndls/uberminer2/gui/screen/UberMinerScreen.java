@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -60,7 +61,7 @@ public class UberMinerScreen extends AbstractContainerScreen<UberMinerContainer>
                 j + 66,
                 i + 9,
                 j + 66 - GuiUtil.lerp(0, 49, menu.getStoredEnergyPercentage()),
-                0xFFFFFFFF
+                0xFF_FF_4F_00
         );
     }
 

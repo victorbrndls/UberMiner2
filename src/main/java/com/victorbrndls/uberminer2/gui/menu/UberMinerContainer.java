@@ -98,6 +98,7 @@ public class UberMinerContainer extends AbstractContainerMenu {
     }
 
     public int getOperationTime() {
+        if (isFinished()) return 0;
         return blockEntity.operationTime;
     }
 
@@ -106,6 +107,7 @@ public class UberMinerContainer extends AbstractContainerMenu {
     }
 
     public float getProgressPercentage() {
+        if (isFinished()) return 0f;
         return blockEntity.operationTime / (float) blockEntity.totalOperationTime;
     }
 
@@ -119,6 +121,10 @@ public class UberMinerContainer extends AbstractContainerMenu {
 
     public float getMinedOresProgress() {
         return getOresMined() / (float) getScannedOres();
+    }
+
+    public boolean isFinished() {
+        return getOresMined() >= getScannedOres();
     }
 
 }
