@@ -1,7 +1,6 @@
 package com.victorbrndls.uberminer2.block;
 
 import com.victorbrndls.uberminer2.entity.UberMinerBlockEntity;
-import com.victorbrndls.uberminer2.item.UberTier;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 
 import net.minecraft.ChatFormatting;
@@ -35,9 +34,9 @@ import java.util.List;
 
 public class UberMinerBlock extends BaseEntityBlock {
 
-    private final UberTier uberTier;
+    private final UberMinerTier uberTier;
 
-    public UberMinerBlock(UberTier uberTier) {
+    public UberMinerBlock(UberMinerTier uberTier) {
         super(BlockBehaviour.Properties.of(Material.DECORATION).strength(0.5F).sound(SoundType.METAL));
         this.uberTier = uberTier;
     }
@@ -87,7 +86,7 @@ public class UberMinerBlock extends BaseEntityBlock {
 
     }
 
-    public UberTier getUberTier() {
+    public UberMinerTier getUberTier() {
         return uberTier;
     }
 

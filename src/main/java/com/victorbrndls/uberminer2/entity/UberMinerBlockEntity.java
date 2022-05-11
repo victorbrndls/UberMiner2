@@ -7,7 +7,7 @@ import com.victorbrndls.uberminer2.block.UberMinerBlock;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorage;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorageImpl;
 import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
-import com.victorbrndls.uberminer2.item.UberTier;
+import com.victorbrndls.uberminer2.block.UberMinerTier;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.util.InventoryUtil;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
@@ -43,7 +43,7 @@ import javax.annotation.Nullable;
 
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
-    private final UberTier uberTier;
+    private final UberMinerTier uberTier;
     private final int chunkRadius;
 
     /**
@@ -107,11 +107,11 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         };
     }
 
-    private UberTier extractBlockTier(BlockState blockState) {
+    private UberMinerTier extractBlockTier(BlockState blockState) {
         if (blockState.getBlock() instanceof UberMinerBlock uberMinerBlock) {
             return uberMinerBlock.getUberTier();
         } else {
-            return UberTier.TIER_I;
+            return UberMinerTier.TIER_I;
         }
     }
 
