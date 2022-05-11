@@ -15,7 +15,11 @@ public class UberMinerBlocks {
                                                                                   UberMiner.MOD_ID);
 
     public static final RegistryObject<Block> UBER_MINER_TIER_1 = BLOCKS.register("uber_miner_tier1",
-                                                                                  UberMinerBlock::new);
+                                                                                  () -> new UberMinerBlock(1));
+    public static final RegistryObject<Block> UBER_MINER_TIER_2 = BLOCKS.register("uber_miner_tier2",
+                                                                                  () -> new UberMinerBlock(2));
+    public static final RegistryObject<Block> UBER_MINER_TIER_3 = BLOCKS.register("uber_miner_tier3",
+                                                                                  () -> new UberMinerBlock(3));
 
     public static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());

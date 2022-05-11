@@ -3,6 +3,7 @@ package com.victorbrndls.uberminer2.entity;
 import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.block.UberMinerBlock;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorage;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorageImpl;
 import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
@@ -41,12 +42,14 @@ import javax.annotation.Nullable;
 
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
+    private final int chunkRadius;
+
     /**
      * Goes from 0 to {@link totalOperationTime}. Represents ticks since last operation.
      */
     public int operationTime = 0;
     public final int totalOperationTime = 60;
-    private final int operationEnergyCost = 4000;
+    private int operationEnergyCost = 4000;
 
     /**
      * Contains all ores the miner mined or will mine
@@ -71,6 +74,15 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     public UberMinerBlockEntity(BlockEntityType<?> entityType, BlockPos blockPos, BlockState blockState) {
         super(entityType, blockPos, blockState);
+        chunkRadius = extractChunkRadius(blockState);
+    }
+
+    private int extractChunkRadius(BlockState blockState) {
+        if (blockState.getBlock() instanceof UberMinerBlock uberMinerBlock) {
+            return uberMinerBlock.getChunkRadius();
+        } else {
+            return 1;
+        }
     }
 
     @Override
@@ -97,7 +109,12 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        return Component.nullToEmpty("Uber Miner I");
+        final var tier = switch (chunkRadius) {
+            case 1 -> "I";
+            case 2 -> "II";
+            default -> "III";
+        };
+        return Component.nullToEmpty("Uber Miner " + tier);
     }
 
     @Override
@@ -117,17 +134,17 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public ItemStack getItem(int slot) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItem(int slot, int count) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -195,12 +212,16 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
     private void scanOres() {
         if (level == null) return;
         LevelChunk chunk = level.getChunkAt(getBlockPos());
-        ChunkPos chunkPos = chunk.getPos();
+        ChunkPos centralChunkPos = chunk.getPos();
+        final var distance = chunkRadius <= 1 ? 0 : chunkRadius - 1;
 
-        final var blocksToScan = BlockPos.betweenClosed(chunkPos.getMinBlockX(), level.getMinBuildHeight(),
-                                                        chunkPos.getMinBlockZ(), chunkPos.getMaxBlockX(),
+        ChunkPos firstChunk = level.getChunk(centralChunkPos.x - distance, centralChunkPos.z - distance).getPos();
+        ChunkPos lastChunk = level.getChunk(centralChunkPos.x + distance, centralChunkPos.z + distance).getPos();
+
+        final var blocksToScan = BlockPos.betweenClosed(firstChunk.getMinBlockX(), level.getMinBuildHeight(),
+                                                        firstChunk.getMinBlockZ(), lastChunk.getMaxBlockX(),
                                                         Math.max(level.getMinBuildHeight(), getBlockPos().getY() - 1),
-                                                        chunkPos.getMaxBlockZ());
+                                                        lastChunk.getMaxBlockZ());
 
         scannedOres = new ArrayList<>();
 
@@ -231,7 +252,6 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
         BlockPos blockPos = getBlockPos().above();
         return InventoryUtil.getItemHandlerAt(level, blockPos, Direction.DOWN);
     }
-
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState state, T blockEntity) {
         ((UberMinerBlockEntity) blockEntity).tick();

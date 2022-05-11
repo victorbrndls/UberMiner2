@@ -34,8 +34,11 @@ import java.util.List;
 
 public class UberMinerBlock extends BaseEntityBlock {
 
-    public UberMinerBlock() {
+    private final int chunkRadius;
+
+    public UberMinerBlock(int chunkRadius) {
         super(BlockBehaviour.Properties.of(Material.DECORATION).strength(0.5F).sound(SoundType.METAL));
+        this.chunkRadius = chunkRadius;
     }
 
     @Override
@@ -81,4 +84,9 @@ public class UberMinerBlock extends BaseEntityBlock {
         components.add(new TextComponent("Items are automatically inserted at chest above miner")
                                .withStyle(ChatFormatting.WHITE));
     }
+
+    public int getChunkRadius() {
+        return chunkRadius;
+    }
+
 }
