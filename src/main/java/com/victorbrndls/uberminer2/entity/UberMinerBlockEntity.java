@@ -7,6 +7,7 @@ import com.victorbrndls.uberminer2.block.UberMinerBlock;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorage;
 import com.victorbrndls.uberminer2.energy.UberEnergyStorageImpl;
 import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
+import com.victorbrndls.uberminer2.item.UberTier;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.util.InventoryUtil;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
@@ -42,14 +43,15 @@ import javax.annotation.Nullable;
 
 public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
+    private final UberTier uberTier;
     private final int chunkRadius;
 
     /**
      * Goes from 0 to {@link totalOperationTime}. Represents ticks since last operation.
      */
     public int operationTime = 0;
-    public final int totalOperationTime = 60;
-    private int operationEnergyCost = 4000;
+    public final int totalOperationTime;
+    private final int operationEnergyCost;
 
     /**
      * Contains all ores the miner mined or will mine
@@ -74,14 +76,42 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     public UberMinerBlockEntity(BlockEntityType<?> entityType, BlockPos blockPos, BlockState blockState) {
         super(entityType, blockPos, blockState);
-        chunkRadius = extractChunkRadius(blockState);
+
+        uberTier = extractBlockTier(blockState);
+        chunkRadius = extractChunkRadius();
+        totalOperationTime = extractTotalOperationTime();
+        operationEnergyCost = extractOperationEnergyCost();
     }
 
-    private int extractChunkRadius(BlockState blockState) {
+    private int extractChunkRadius() {
+        return switch (uberTier) {
+            case TIER_I -> 1;
+            case TIER_II -> 2;
+            case TIER_III -> 3;
+        };
+    }
+
+    private int extractTotalOperationTime() {
+        return switch (uberTier) {
+            case TIER_I -> 160;
+            case TIER_II -> 120;
+            case TIER_III -> 60;
+        };
+    }
+
+    private int extractOperationEnergyCost() {
+        return switch (uberTier) {
+            case TIER_I -> 4000;
+            case TIER_II -> 5000;
+            case TIER_III -> 6500;
+        };
+    }
+
+    private UberTier extractBlockTier(BlockState blockState) {
         if (blockState.getBlock() instanceof UberMinerBlock uberMinerBlock) {
-            return uberMinerBlock.getChunkRadius();
+            return uberMinerBlock.getUberTier();
         } else {
-            return 1;
+            return UberTier.TIER_I;
         }
     }
 
@@ -109,10 +139,10 @@ public class UberMinerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        final var tier = switch (chunkRadius) {
-            case 1 -> "I";
-            case 2 -> "II";
-            default -> "III";
+        final var tier = switch (uberTier) {
+            case TIER_I -> "I";
+            case TIER_II -> "II";
+            case TIER_III -> "III";
         };
         return Component.nullToEmpty("Uber Miner " + tier);
     }

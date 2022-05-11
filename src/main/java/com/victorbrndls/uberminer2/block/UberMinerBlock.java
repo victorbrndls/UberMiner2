@@ -1,6 +1,7 @@
 package com.victorbrndls.uberminer2.block;
 
 import com.victorbrndls.uberminer2.entity.UberMinerBlockEntity;
+import com.victorbrndls.uberminer2.item.UberTier;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 
 import net.minecraft.ChatFormatting;
@@ -34,11 +35,11 @@ import java.util.List;
 
 public class UberMinerBlock extends BaseEntityBlock {
 
-    private final int chunkRadius;
+    private final UberTier uberTier;
 
-    public UberMinerBlock(int chunkRadius) {
+    public UberMinerBlock(UberTier uberTier) {
         super(BlockBehaviour.Properties.of(Material.DECORATION).strength(0.5F).sound(SoundType.METAL));
-        this.chunkRadius = chunkRadius;
+        this.uberTier = uberTier;
     }
 
     @Override
@@ -85,8 +86,8 @@ public class UberMinerBlock extends BaseEntityBlock {
                                .withStyle(ChatFormatting.WHITE));
     }
 
-    public int getChunkRadius() {
-        return chunkRadius;
+    public UberTier getUberTier() {
+        return uberTier;
     }
 
 }
