@@ -1,6 +1,8 @@
 package com.victorbrndls.uberminer2.registry;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.item.OreAttractorItem;
+import com.victorbrndls.uberminer2.item.OreAttractorTier;
 import com.victorbrndls.uberminer2.item.UberBallItem;
 import com.victorbrndls.uberminer2.item.UberBallUpgrades;
 
@@ -35,6 +37,9 @@ public class UberMinerItems {
             UberMinerBlocks.UBER_MINER_TIER_2.get(), new Item.Properties().stacksTo(1).tab(UberMiner.UBER_MINER_TAB)));
     public static final RegistryObject<Item> UBER_MINER_TIER_3 = ITEMS.register("uber_miner_tier3", () -> new BlockItem(
             UberMinerBlocks.UBER_MINER_TIER_3.get(), new Item.Properties().stacksTo(1).tab(UberMiner.UBER_MINER_TAB)));
+
+    public static final RegistryObject<Item> ORE_ATTRACTOR = ITEMS.register("ore_attractor",
+                                                                            () -> new OreAttractorItem());
 
     public static void init() {
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
