@@ -84,6 +84,7 @@ public class UberMinerBlock extends BaseEntityBlock {
 
         components.add(new TextComponent("Items are automatically inserted at chest above miner")
                                .withStyle(ChatFormatting.WHITE));
+
     }
 
     public UberTier getUberTier() {

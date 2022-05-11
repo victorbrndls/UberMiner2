@@ -7,22 +7,22 @@
   ],
   "key": {
     "R": {
-      "item": "minecraft:redstone"
+      "item": "minecraft:redstone_block"
     },
     "D": {
       "item": "minecraft:diamond"
     },
     "Y": {
-      "item": "minecraft:iron_pickaxe"
+      "item": "minecraft:golden_pickaxe"
     },
     "Z": {
-      "item": "minecraft:iron_shovel"
+      "item": "minecraft:golden_shovel"
     },
     "B": {
       "item": "uberminer2:uber_ball_tier2"
     },
     "I": {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:iron_block"
     },
     "L": {
       "item": "minecraft:iron_block"
