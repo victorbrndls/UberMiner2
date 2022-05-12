@@ -9,6 +9,7 @@ import com.victorbrndls.uberminer2.util.LootContextUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
@@ -30,22 +31,42 @@ import java.util.List;
 
 public class OreAttractorItem extends Item {
 
+    public static String TAG_ELEMENT = "Properties";
+    public static String TAG_ELEMENT_TIER = "Tier";
+
+    @Nullable
     private OreAttractorTier tier;
 
     private int operationTime = 0;
     private boolean isActive = false;
 
     public OreAttractorItem() {
-        this(OreAttractorTier.TIER_I);
-    }
-
-    public OreAttractorItem(OreAttractorTier tier) {
         super(new Item.Properties()
-                      .durability(tier.durability)
+                      .durability(1)
                       .setNoRepair()
                       .tab(UberMiner.UBER_MINER_TAB)
         );
-        this.tier = tier;
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return getTier(stack).durability;
+    }
+
+    private OreAttractorTier getTier(ItemStack itemStack) {
+        if (tier == null) {
+            CompoundTag tag = itemStack.getOrCreateTagElement(TAG_ELEMENT);
+
+            final var tierName = tag.getString(TAG_ELEMENT_TIER);
+            try {
+                OreAttractorTier.valueOf(tierName);
+            } catch (IllegalArgumentException | NullPointerException e) {
+                UberMiner.LOGGER.error("Couldn't read tier, name: {}", tierName, e);
+                tier = OreAttractorTier.TIER_I;
+            }
+        }
+
+        return tier;
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -63,10 +84,10 @@ public class OreAttractorItem extends Item {
         if (!isActive) return;
 
         operationTime++;
-        if (operationTime < tier.operationTime) return;
+        if (operationTime < getTier(itemStack).operationTime) return;
         operationTime = 0;
 
-        final var mined = mineOre(entity);
+        final var mined = mineOre(entity, itemStack);
 
         if (mined && entity instanceof Player player) {
             if (!player.getAbilities().instabuild)
@@ -77,9 +98,9 @@ public class OreAttractorItem extends Item {
     /**
      * @return true if ore was mined
      */
-    private boolean mineOre(Entity entity) {
+    private boolean mineOre(Entity entity, ItemStack itemStack) {
         Level level = entity.level;
-        final var ore = findOre(entity.level, entity.blockPosition());
+        final var ore = findOre(entity.level, entity.blockPosition(), getTier(itemStack).radius);
         if (ore == null) return false;
 
         BlockPos orePos = ore.getFirst();
@@ -93,17 +114,9 @@ public class OreAttractorItem extends Item {
         return true;
     }
 
-    private void dropOre(Entity entity, Level level, BlockPos orePos, BlockState oreState) {
-        LootContext.Builder lootContextBuilder = LootContextUtil.getLootContextBuilder(level, orePos);
-        final var drops = oreState.getDrops(lootContextBuilder);
-
-        var spawnPos = entity.blockPosition();
-        ItemStackUtil.drop(level, spawnPos, drops);
-    }
-
     @Nullable
-    private Pair<BlockPos, BlockState> findOre(Level level, BlockPos position) {
-        final var distance = tier.radius <= 1 ? 1 : tier.radius - 1;
+    private Pair<BlockPos, BlockState> findOre(Level level, BlockPos position, int radius) {
+        final var distance = radius <= 1 ? 1 : radius - 1;
 
         final var blocksToScan = BlockPos.betweenClosed(
                 position.getX() - distance,
@@ -120,6 +133,14 @@ public class OreAttractorItem extends Item {
         }
 
         return null;
+    }
+
+    private void dropOre(Entity entity, Level level, BlockPos orePos, BlockState oreState) {
+        LootContext.Builder lootContextBuilder = LootContextUtil.getLootContextBuilder(level, orePos);
+        final var drops = oreState.getDrops(lootContextBuilder);
+
+        var spawnPos = entity.blockPosition();
+        ItemStackUtil.drop(level, spawnPos, drops);
     }
 
     @Override
@@ -141,8 +162,12 @@ public class OreAttractorItem extends Item {
     ) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
 
-        components.add(new TextComponent(tier.radius + "x" + tier.radius).withStyle(ChatFormatting.BLUE));
-        components.add(new TextComponent("Right click to enable/disable").withStyle(ChatFormatting.WHITE));
+        components.add(
+                new TextComponent(getTier(itemStack).radius + "x" + getTier(itemStack).radius)
+                        .withStyle(ChatFormatting.BLUE));
+        components.add(
+                new TextComponent("Right click to enable/disable")
+                        .withStyle(ChatFormatting.WHITE));
     }
 
 }

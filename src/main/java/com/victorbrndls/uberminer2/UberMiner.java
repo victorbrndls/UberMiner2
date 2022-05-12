@@ -6,6 +6,7 @@ import com.victorbrndls.uberminer2.registry.UberMinerBlocks;
 import com.victorbrndls.uberminer2.registry.UberMinerEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerItems;
 import com.victorbrndls.uberminer2.registry.UberMinerMenus;
+import com.victorbrndls.uberminer2.registry.UberMinerRecipes;
 import com.victorbrndls.uberminer2.render.UberMinerRenders;
 import com.victorbrndls.uberminer2.tab.UberMinerTab;
 
@@ -34,6 +35,7 @@ public class UberMiner {
         UberMinerEntities.init();
         UberMinerBlockEntities.init();
         UberMinerMenus.init();
+        UberMinerRecipes.init();
     }
 
     @SubscribeEvent
