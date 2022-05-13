@@ -33,12 +33,8 @@ public class OreAttractorItem extends Item {
 
     public static String TAG_ELEMENT = "Properties";
     public static String TAG_ELEMENT_TIER = "Tier";
-
-    @Nullable
-    private OreAttractorTier tier;
-
-    private int operationTime = 0;
-    private boolean isActive = false;
+    public static String TAG_ELEMENT_ACTIVE = "Active";
+    public static String TAG_ELEMENT_OPERATION_TICK = "OperationTick";
 
     public OreAttractorItem() {
         super(new Item.Properties()
@@ -48,32 +44,28 @@ public class OreAttractorItem extends Item {
         );
     }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return getTier(stack).durability;
+    private OreAttractorTier getTier(ItemStack itemStack) {
+        final var tierName = getTag(itemStack).getString(TAG_ELEMENT_TIER);
+
+        try {
+            return OreAttractorTier.valueOf(tierName);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            UberMiner.LOGGER.error("Couldn't read tier, name: {}", tierName, e);
+            return OreAttractorTier.TIER_I;
+        }
     }
 
-    private OreAttractorTier getTier(ItemStack itemStack) {
-        if (tier == null) {
-            CompoundTag tag = itemStack.getOrCreateTagElement(TAG_ELEMENT);
-
-            final var tierName = tag.getString(TAG_ELEMENT_TIER);
-            try {
-                OreAttractorTier.valueOf(tierName);
-            } catch (IllegalArgumentException | NullPointerException e) {
-                UberMiner.LOGGER.error("Couldn't read tier, name: {}", tierName, e);
-                tier = OreAttractorTier.TIER_I;
-            }
-        }
-
-        return tier;
+    @Override
+    public int getMaxDamage(ItemStack itemStack) {
+        if (!getTag(itemStack).contains(TAG_ELEMENT_TIER)) return 1;
+        return getTier(itemStack).durability;
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (!level.isClientSide)
-            isActive = !isActive;
+        if (!level.isClientSide) // maybe remove?
+            toggleActive(itemStack);
 
         return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide);
     }
@@ -81,11 +73,11 @@ public class OreAttractorItem extends Item {
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
         if (level.isClientSide) return;
-        if (!isActive) return;
+        if (!isActive(itemStack)) return;
+        final var server = level.getServer();
 
-        operationTime++;
-        if (operationTime < getTier(itemStack).operationTime) return;
-        operationTime = 0;
+        if (!isReadyForOperation(itemStack, server.getTickCount())) return;
+        setNextOperationTick(itemStack, server.getTickCount());
 
         final var mined = mineOre(entity, itemStack);
 
@@ -150,7 +142,43 @@ public class OreAttractorItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack itemStack) {
-        return isActive;
+        return isActive(itemStack);
+    }
+
+    private CompoundTag getTag(ItemStack itemStack) {
+        return itemStack.getOrCreateTagElement(TAG_ELEMENT);
+    }
+
+    private void setActive(ItemStack itemStack, boolean isActive) {
+        getTag(itemStack).putBoolean(TAG_ELEMENT_ACTIVE, isActive);
+    }
+
+    private boolean isActive(ItemStack itemStack) {
+        return getTag(itemStack).getBoolean(TAG_ELEMENT_ACTIVE);
+    }
+
+    private void toggleActive(ItemStack itemStack) {
+        setActive(itemStack, !isActive(itemStack));
+    }
+
+    private void setOperationTick(ItemStack itemStack, long tick) {
+        getTag(itemStack).putLong(TAG_ELEMENT_OPERATION_TICK, tick);
+    }
+
+    private long getOperationTick(ItemStack itemStack) {
+        return getTag(itemStack).getLong(TAG_ELEMENT_OPERATION_TICK);
+    }
+
+    private void setNextOperationTick(ItemStack itemStack, long serverTick) {
+        final var operationTime = getTier(itemStack).operationTime;
+        setOperationTick(itemStack, serverTick + operationTime);
+    }
+
+    private boolean isReadyForOperation(ItemStack itemStack, long serverTick) {
+        final var nextTick = getOperationTick(itemStack);
+        if (nextTick == 0L) setNextOperationTick(itemStack, serverTick);
+
+        return serverTick > nextTick;
     }
 
     @Override
@@ -162,9 +190,12 @@ public class OreAttractorItem extends Item {
     ) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
 
-        components.add(
-                new TextComponent(getTier(itemStack).radius + "x" + getTier(itemStack).radius)
-                        .withStyle(ChatFormatting.BLUE));
+        if (getTag(itemStack).contains(TAG_ELEMENT_TIER)) {
+            components.add(
+                    new TextComponent(getTier(itemStack).radius + "x" + getTier(itemStack).radius)
+                            .withStyle(ChatFormatting.BLUE));
+        }
+
         components.add(
                 new TextComponent("Right click to enable/disable")
                         .withStyle(ChatFormatting.WHITE));
