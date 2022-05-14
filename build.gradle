@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '2.0.4'
+version = '2.0.5'
 group = 'com.victorbrndls.uberminer2'
 archivesBaseName = "UberMiner"
 
