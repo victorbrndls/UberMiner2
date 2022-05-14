@@ -111,6 +111,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:$version_minecraft-$version_forge"
 
+    compileOnly fg.deobf("mezz.jei:jei-$version_minecraft:$version_jei:api")
     runtimeOnly fg.deobf("mezz.jei:jei-$version_minecraft:$version_jei")
 
     runtimeOnly fg.deobf("mekanism:Mekanism:$version_mekanism")

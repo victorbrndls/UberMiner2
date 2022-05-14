@@ -12,8 +12,10 @@ import com.victorbrndls.uberminer2.tab.UberMinerTab;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -35,7 +37,6 @@ public class UberMiner {
         UberMinerEntities.init();
         UberMinerBlockEntities.init();
         UberMinerMenus.init();
-        UberMinerRecipes.init();
     }
 
     @SubscribeEvent
@@ -46,5 +47,10 @@ public class UberMiner {
     @SubscribeEvent
     public static void registerRenders(EntityRenderersEvent.RegisterRenderers event) {
         UberMinerRenders.init(event);
+    }
+
+    @SubscribeEvent
+    public static void register(final RegistryEvent.Register<RecipeSerializer<?>> event) {
+        UberMinerRecipes.init(event.getRegistry());
     }
 }

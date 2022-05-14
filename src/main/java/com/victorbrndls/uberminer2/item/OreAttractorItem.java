@@ -4,6 +4,7 @@ import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
 
 import com.mojang.datafixers.util.Pair;
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.registry.UberMinerItems;
 import com.victorbrndls.uberminer2.util.ItemStackUtil;
 import com.victorbrndls.uberminer2.util.LootContextUtil;
 
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -44,14 +46,21 @@ public class OreAttractorItem extends Item {
         );
     }
 
+    @NotNull
     private OreAttractorTier getTier(ItemStack itemStack) {
+        final var tier = getTierOrNull(itemStack);
+        if (tier != null) return tier;
+
+        return OreAttractorTier.TIER_I;
+    }
+
+    public static OreAttractorTier getTierOrNull(ItemStack itemStack) {
         final var tierName = getTag(itemStack).getString(TAG_ELEMENT_TIER);
 
         try {
             return OreAttractorTier.valueOf(tierName);
         } catch (IllegalArgumentException | NullPointerException e) {
-            UberMiner.LOGGER.error("Couldn't read tier, name: {}", tierName, e);
-            return OreAttractorTier.TIER_I;
+            return null;
         }
     }
 
@@ -64,7 +73,7 @@ public class OreAttractorItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (!level.isClientSide) // maybe remove?
+        if (!level.isClientSide)
             toggleActive(itemStack);
 
         return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide);
@@ -145,7 +154,7 @@ public class OreAttractorItem extends Item {
         return isActive(itemStack);
     }
 
-    private CompoundTag getTag(ItemStack itemStack) {
+    private static CompoundTag getTag(ItemStack itemStack) {
         return itemStack.getOrCreateTagElement(TAG_ELEMENT);
     }
 
@@ -199,6 +208,15 @@ public class OreAttractorItem extends Item {
         components.add(
                 new TextComponent("Right click to enable/disable")
                         .withStyle(ChatFormatting.WHITE));
+    }
+
+    public static ItemStack createFromTier(OreAttractorTier tier) {
+        ItemStack itemStack = new ItemStack(UberMinerItems.ORE_ATTRACTOR.get(), 1);
+        CompoundTag tag = itemStack.getOrCreateTagElement(TAG_ELEMENT);
+
+        tag.putString(TAG_ELEMENT_TIER, tier.name());
+        
+        return itemStack;
     }
 
 }
