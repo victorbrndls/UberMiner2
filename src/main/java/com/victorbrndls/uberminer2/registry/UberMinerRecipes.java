@@ -15,7 +15,7 @@ public class UberMinerRecipes {
     private static final Supplier<RecipeSerializer<?>> ORE_ATTRACTOR_RECIPE = () -> new SimpleRecipeSerializer<>(
             (id) -> OreAttractorRecipeMaker.getRecipes().stream().filter(cr -> cr.getId().equals(id)).findFirst()
                                            .orElse(null) //
-    ).setRegistryName(new ResourceLocation(UberMiner.MOD_ID, "shaped_recipe"));
+    ).setRegistryName(new ResourceLocation(UberMiner.MOD_ID, "ore_attractor_custom"));
 
     public static void init(IForgeRegistry<RecipeSerializer<?>> registry) {
         registry.registerAll(ORE_ATTRACTOR_RECIPE.get());

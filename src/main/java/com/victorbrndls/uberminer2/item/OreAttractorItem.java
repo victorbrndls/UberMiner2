@@ -10,6 +10,8 @@ import com.victorbrndls.uberminer2.util.LootContextUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -18,9 +20,12 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +34,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class OreAttractorItem extends Item {
@@ -210,12 +216,21 @@ public class OreAttractorItem extends Item {
                         .withStyle(ChatFormatting.WHITE));
     }
 
+    @Override
+    public void fillItemCategory(CreativeModeTab category, NonNullList<ItemStack> items) {
+        if (allowdedIn(category)) {
+            for (OreAttractorTier tier : OreAttractorTier.values()) {
+                items.add(createFromTier(tier));
+            }
+        }
+    }
+
     public static ItemStack createFromTier(OreAttractorTier tier) {
         ItemStack itemStack = new ItemStack(UberMinerItems.ORE_ATTRACTOR.get(), 1);
         CompoundTag tag = itemStack.getOrCreateTagElement(TAG_ELEMENT);
 
         tag.putString(TAG_ELEMENT_TIER, tier.name());
-        
+
         return itemStack;
     }
 
