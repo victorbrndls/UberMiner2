@@ -8,7 +8,7 @@ public class OreUtil {
     private static final ResourceLocation oreResourceLocation = new ResourceLocation("forge", "ores");
 
     public static boolean isOre(BlockState blockState) {
-        return blockState.getTags().anyMatch((tag) -> tag.location().equals(oreResourceLocation));
+        return blockState.getBlock().getTags().stream().anyMatch((tag) -> tag.equals(oreResourceLocation));
     }
 
 }

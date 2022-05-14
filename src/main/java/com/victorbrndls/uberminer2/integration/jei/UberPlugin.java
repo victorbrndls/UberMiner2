@@ -20,7 +20,7 @@ public class UberPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, UberMinerItems.ORE_ATTRACTOR.get(),
+        registration.registerSubtypeInterpreter(UberMinerItems.ORE_ATTRACTOR.get(),
                                                 OreAttractorSubtypeInterpreter.INSTANCE);
     }
 
