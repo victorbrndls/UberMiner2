@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "uberminer2:block/resource_miner"
+    }
+  }
+}

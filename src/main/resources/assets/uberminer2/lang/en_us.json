@@ -13,5 +13,7 @@
 
   "block.uberminer2.uber_miner_tier1": "Uber Miner I",
   "block.uberminer2.uber_miner_tier2": "Uber Miner II",
-  "block.uberminer2.uber_miner_tier3": "Uber Miner III"
+  "block.uberminer2.uber_miner_tier3": "Uber Miner III",
+
+  "block.uberminer2.resource_miner": "Resource Miner"
 }

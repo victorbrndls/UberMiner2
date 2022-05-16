@@ -1,6 +1,7 @@
 package com.victorbrndls.uberminer2.registry;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.gui.menu.ResourceMinerContainer;
 import com.victorbrndls.uberminer2.gui.menu.UberMinerContainer;
 
 import net.minecraft.core.BlockPos;
@@ -22,6 +23,13 @@ public class UberMinerMenus {
                 BlockPos blockPos = data.readBlockPos();
                 Level level = inv.player.getCommandSenderWorld();
                 return new UberMinerContainer(windowId, level, blockPos, inv, inv.player);
+            }));
+
+    public static final RegistryObject<MenuType<ResourceMinerContainer>> RESOURCE_MINER =
+            MENUS.register("resource_miner", () -> IForgeMenuType.create((windowId, inv, data) -> {
+                BlockPos blockPos = data.readBlockPos();
+                Level level = inv.player.getCommandSenderWorld();
+                return new ResourceMinerContainer(windowId, level, blockPos, inv, inv.player);
             }));
 
     public static void init() {

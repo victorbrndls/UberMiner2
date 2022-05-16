@@ -1,6 +1,6 @@
 package com.victorbrndls.uberminer2.item;
 
-import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
+import static com.victorbrndls.uberminer2.util.BlockUtil.isOre;
 
 import com.mojang.datafixers.util.Pair;
 import com.victorbrndls.uberminer2.UberMiner;
@@ -11,7 +11,6 @@ import com.victorbrndls.uberminer2.util.LootContextUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -24,8 +23,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,7 +31,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class OreAttractorItem extends Item {

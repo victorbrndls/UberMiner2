@@ -1,5 +1,6 @@
 package com.victorbrndls.uberminer2;
 
+import com.victorbrndls.uberminer2.gui.screen.ResourceMinerScreen;
 import com.victorbrndls.uberminer2.gui.screen.UberMinerScreen;
 import com.victorbrndls.uberminer2.registry.UberMinerBlockEntities;
 import com.victorbrndls.uberminer2.registry.UberMinerBlocks;
@@ -42,6 +43,7 @@ public class UberMiner {
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent e) {
         MenuScreens.register(UberMinerMenus.UBER_MINER.get(), UberMinerScreen::new);
+        MenuScreens.register(UberMinerMenus.RESOURCE_MINER.get(), ResourceMinerScreen::new);
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 package com.victorbrndls.uberminer2.registry;
 
 import com.victorbrndls.uberminer2.UberMiner;
+import com.victorbrndls.uberminer2.block.ResourceMinerBlock;
 import com.victorbrndls.uberminer2.block.UberMinerBlock;
 import com.victorbrndls.uberminer2.block.UberMinerTier;
 
@@ -24,6 +25,8 @@ public class UberMinerBlocks {
     public static final RegistryObject<Block> UBER_MINER_TIER_3 = BLOCKS.register("uber_miner_tier3",
                                                                                   () -> new UberMinerBlock(
                                                                                           UberMinerTier.TIER_III));
+
+    public static final RegistryObject<Block> RESOURCE_MINER = BLOCKS.register("resource_miner", ResourceMinerBlock::new);
 
     public static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());

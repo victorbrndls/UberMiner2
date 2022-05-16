@@ -1,6 +1,6 @@
 package com.victorbrndls.uberminer2.entity;
 
-import static com.victorbrndls.uberminer2.util.OreUtil.isOre;
+import static com.victorbrndls.uberminer2.util.BlockUtil.isOre;
 
 import com.victorbrndls.uberminer2.UberMiner;
 import com.victorbrndls.uberminer2.block.UberMinerBlock;

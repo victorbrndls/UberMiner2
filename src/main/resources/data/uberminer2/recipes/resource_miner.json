@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AAA",
+    "PCS",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "minecraft:stone"
+    },
+    "P": {
+      "item": "minecraft:iron_pickaxe"
+    },
+    "S": {
+      "item": "minecraft:iron_shovel"
+    }
+  },
+  "result": {
+    "item": "uberminer2:resource_miner",
+    "count": 1
+  }
+}

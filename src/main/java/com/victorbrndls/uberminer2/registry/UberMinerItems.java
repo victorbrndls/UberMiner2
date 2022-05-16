@@ -38,6 +38,9 @@ public class UberMinerItems {
     public static final RegistryObject<Item> UBER_MINER_TIER_3 = ITEMS.register("uber_miner_tier3", () -> new BlockItem(
             UberMinerBlocks.UBER_MINER_TIER_3.get(), new Item.Properties().stacksTo(1).tab(UberMiner.UBER_MINER_TAB)));
 
+    public static final RegistryObject<Item> RESOURCE_MINER = ITEMS.register("resource_miner", () -> new BlockItem(
+            UberMinerBlocks.RESOURCE_MINER.get(), new Item.Properties().stacksTo(1).tab(UberMiner.UBER_MINER_TAB)));
+
     public static final RegistryObject<Item> ORE_ATTRACTOR = ITEMS.register("ore_attractor", OreAttractorItem::new);
 
     public static void init() {
