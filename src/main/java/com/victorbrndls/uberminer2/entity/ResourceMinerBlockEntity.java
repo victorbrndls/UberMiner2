@@ -30,6 +30,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,8 +40,8 @@ public class ResourceMinerBlockEntity extends BaseContainerBlockEntity {
      * Goes from 0 to {@link totalOperationTime}. Represents ticks since last operation.
      */
     public int operationTime = 0;
-    public final int totalOperationTime = 20;
-    private final int operationEnergyCost = 2000;
+    public final int totalOperationTime = 10;
+    private final int operationEnergyCost = 1000;
 
     /**
      * Contains all ores the miner mined or will mine
@@ -203,6 +204,9 @@ public class ResourceMinerBlockEntity extends BaseContainerBlockEntity {
             if (isResource(block)) scannedBlocks.add(blockPos.immutable());
         });
         UberMiner.LOGGER.debug("Found {} blocks", scannedBlocks.size());
+
+        // Reverse blocks because it naturally stars at the bottom
+        Collections.reverse(scannedBlocks);
 
         blocksToBreak = scannedBlocks.iterator();
         scannedBlocksCount = scannedBlocks.size();

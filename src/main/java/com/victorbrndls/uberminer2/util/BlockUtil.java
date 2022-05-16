@@ -14,6 +14,8 @@ public class BlockUtil {
     public static boolean isResource(BlockState blockState) {
         if (blockState.isAir()) return false;
         if (blockState.hasBlockEntity()) return false;
+        if (blockState.getBlock().defaultDestroyTime() == -1f) return false;
+
         return blockState.getTags().noneMatch((tag) -> tag.location().equals(oreResourceLocation));
     }
 
