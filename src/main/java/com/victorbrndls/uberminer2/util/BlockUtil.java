@@ -16,7 +16,7 @@ public class BlockUtil {
         if (blockState.hasBlockEntity()) return false;
         if (blockState.getBlock().defaultDestroyTime() == -1f) return false;
 
-        return blockState.getTags().noneMatch((tag) -> tag.location().equals(oreResourceLocation));
+        return blockState.getBlock().getTags().stream().noneMatch((tag) -> tag.equals(oreResourceLocation));
     }
 
 }
